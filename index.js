@@ -22,6 +22,11 @@ const setup = () => {
   ROADS.push (new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) }))
 }
 
+const shiftWorld = (vector) => {
+  HOUSES.forEach(house => { house.x += vector.x; house.y += vector.y })
+  ROADS.forEach( road =>  { road.x += vector.x; road.y += vector.y })
+}
+
 class Agent {
   constructor(opts) {
     this.x = opts.x
@@ -33,10 +38,10 @@ class Agent {
   }
 
   move() { 
-    if(KEY_PRESSED === 'ArrowUp') { this.y -= this.speed }
-    if(KEY_PRESSED === 'ArrowDown') { this.y += this.speed }
-    if(KEY_PRESSED === 'ArrowLeft') { this.x -= this.speed }
-    if(KEY_PRESSED === 'ArrowRight') { this.x += this.speed }
+    if(KEY_PRESSED === 'ArrowUp')    { shiftWorld({ x: 0, y: this.speed  }) }
+    if(KEY_PRESSED === 'ArrowDown')  { shiftWorld({ x: 0, y: -this.speed }) }
+    if(KEY_PRESSED === 'ArrowLeft')  { shiftWorld({ x: this.speed,  y: 0 }) }
+    if(KEY_PRESSED === 'ArrowRight') { shiftWorld({ x: -this.speed, y: 0 }) }
 
     KEY_PRESSED = null
  }
