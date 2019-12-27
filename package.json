@@ -1,0 +1,10 @@
+{
+  "name": "roguelike",
+  "version": "1.0.0",
+  "description": "A roguelike.",
+  "main": "index.js",
+  "repository": "https://github.com/sjmog/roguelike",
+  "author": "sjmog",
+  "license": "MIT",
+  "private": false
+}
