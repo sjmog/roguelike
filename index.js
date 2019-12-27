@@ -5,26 +5,29 @@ const AGENTS = []
 const HOUSES = []
 const ROADS  = []
 
+const TILE_SIZE = 32
+
+const TILE = number => TILE_SIZE * number
+
 const setup = () => {
   CANVAS.height = window.innerHeight
   CANVAS.width = window.innerWidth
 
-  AGENTS.push(new Agent(412.5, 412.5, 20, 20, '#ffaffa', 1))
-  HOUSES.push(new House(100, 100))
-  HOUSES.push(new House(450, 400))
-  ROADS.push (new Road(150, 200, 150, 50))
-  ROADS.push (new Road(250, 200, 50, 200))
-  ROADS.push (new Road(250, 400, 200, 50))
+  AGENTS.push(new Agent({ x: TILE(10), y: TILE(9), width: TILE(1), height: TILE(1), color: '#ffaffa', speed: 1 }))
+  HOUSES.push(new House({ x: TILE(3),  y: TILE(3) }))
+  HOUSES.push(new House({ x: TILE(10), y: TILE(10) }))
+  ROADS.push (new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }))
+  ROADS.push (new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) }))
 }
 
 class Agent {
-  constructor(x, y, width, height, color, speed) {
-    this.x = x
-    this.y = y
-    this.width = width
-    this.height = height
-    this.color = color
-    this.speed = speed
+  constructor(opts) {
+    this.x = opts.x
+    this.y = opts.y
+    this.width = opts.width
+    this.height = opts.height
+    this.color = opts.color
+    this.speed = opts.speed
   }
 
   move() {
@@ -38,14 +41,14 @@ class Agent {
 }
 
 class House extends Agent {
-  constructor(x, y) {
-    super(x, y, 100, 100, '#faafaa', false)
+  constructor(opts) {
+    super({ x: opts.x, y: opts.y, height: TILE(2), width: TILE(2), color: '#faafaa', speed: 0 })
   }
 }
 
 class Road extends Agent {
-  constructor(x, y, lengthX, lengthY) {
-    super(x, y, lengthX, lengthY, '#affaff', 0)
+  constructor(opts) {
+    super({ x: opts.x, y: opts.y, width: opts.lengthX, height: opts.lengthY, color: '#affaff', speed: 0 })
   }
 }
 
