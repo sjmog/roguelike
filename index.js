@@ -5,7 +5,7 @@ const AGENTS = []
 const HOUSES = []
 const ROADS  = []
 
-const TILE_SIZE = 32
+const TILE_SIZE = window.innerWidth / 64
 
 const TILE = number => TILE_SIZE * number
 
@@ -30,9 +30,7 @@ class Agent {
     this.speed = opts.speed
   }
 
-  move() {
-    this.x -= this.speed
-  }
+  move() { return }
 
   draw() {
     CONTEXT.fillStyle = this.color
