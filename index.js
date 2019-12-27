@@ -9,11 +9,13 @@ const TILE_SIZE = window.innerWidth / 64
 
 const TILE = number => TILE_SIZE * number
 
+let KEY_PRESSED = null
+
 const setup = () => {
   CANVAS.height = window.innerHeight
   CANVAS.width = window.innerWidth
 
-  AGENTS.push(new Agent({ x: TILE(10), y: TILE(9), width: TILE(1), height: TILE(1), color: '#ffaffa', speed: 1 }))
+  AGENTS.push(new Agent({ x: TILE(10), y: TILE(9), width: TILE(1), height: TILE(1), color: '#ffaffa', speed: TILE(0.2) }))
   HOUSES.push(new House({ x: TILE(3),  y: TILE(3) }))
   HOUSES.push(new House({ x: TILE(10), y: TILE(10) }))
   ROADS.push (new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }))
@@ -30,7 +32,14 @@ class Agent {
     this.speed = opts.speed
   }
 
-  move() { return }
+  move() { 
+    if(KEY_PRESSED === 'ArrowUp') { this.y -= this.speed }
+    if(KEY_PRESSED === 'ArrowDown') { this.y += this.speed }
+    if(KEY_PRESSED === 'ArrowLeft') { this.x -= this.speed }
+    if(KEY_PRESSED === 'ArrowRight') { this.x += this.speed }
+
+    KEY_PRESSED = null
+ }
 
   draw() {
     CONTEXT.fillStyle = this.color
@@ -73,6 +82,8 @@ const tick = () => {
 
   window.requestAnimationFrame(tick)
 }
+
+window.addEventListener('keydown', (event) => { KEY_PRESSED = event.key })
 
 const start = () => {
   tick()
