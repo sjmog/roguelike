@@ -1,33 +1,68 @@
-const CANVAS = document.getElementById('canvas')
-const CONTEXT = CANVAS.getContext('2d')
-
-const AGENTS = []
-const HOUSES = []
-const ROADS  = []
-
 const TILE_SIZE = window.innerWidth / 64
 
 const TILE = number => TILE_SIZE * number
 
-let KEY_PRESSED = null
+const setup = (canvas) => {
+  canvas.height = window.innerHeight
+  canvas.width = window.innerWidth
 
-const setup = () => {
-  CANVAS.height = window.innerHeight
-  CANVAS.width = window.innerWidth
+  const world = new World(
+    {
+      context: canvas.getContext('2d'),
+      entities: [
+        new House({ x: TILE(3),  y: TILE(3) }),
+        new House({ x: TILE(10), y: TILE(10) }),
+        new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }),
+        new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) })
+      ],
+      character: new Character({ x: TILE(10), y: TILE(9) })
+    }
+  )
 
-  AGENTS.push(new Agent({ x: TILE(10), y: TILE(9), width: TILE(1), height: TILE(1), color: '#ffaffa', speed: TILE(0.2) }))
-  HOUSES.push(new House({ x: TILE(3),  y: TILE(3) }))
-  HOUSES.push(new House({ x: TILE(10), y: TILE(10) }))
-  ROADS.push (new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }))
-  ROADS.push (new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) }))
+  window.addEventListener('keydown', (event) => { world.keyPresses.push(event.key) })
+
+  return world
 }
 
-const shiftWorld = (vector) => {
-  HOUSES.forEach(house => { house.x += vector.x; house.y += vector.y })
-  ROADS.forEach( road =>  { road.x += vector.x; road.y += vector.y })
+class World {
+  constructor(opts) {
+    this.context = opts.context
+    this.entities = opts.entities
+    this.character = opts.character
+    this.keyPresses = []
+  }
+
+  clear() {
+    this.context.clearRect(0, 0, window.innerHeight, window.innerWidth)
+  }
+
+  move() {
+    this.keyPresses.forEach(key => {
+      const KEY_MAP = {
+        ArrowUp:    { x:  0, y:  1 },
+        ArrowDown:  { x:  0, y: -1 },
+        ArrowLeft:  { x:  1, y:  0 },
+        ArrowRight: { x: -1, y:  0 }
+      }
+
+      const vector = KEY_MAP[key]
+
+      this.entities.forEach(entity => { 
+        entity.x += (vector.x * this.character.speed)
+        entity.y += (vector.y * this.character.speed)
+      })
+    })
+
+    this.keyPresses = []
+  }
+
+  draw() {
+    this.entities.forEach(entity => entity.draw(this.context))
+    this.character.draw(this.context)
+  }
 }
 
-class Agent {
+class Entity {
   constructor(opts) {
     this.x = opts.x
     this.y = opts.y
@@ -37,62 +72,41 @@ class Agent {
     this.speed = opts.speed
   }
 
-  move() { 
-    if(KEY_PRESSED === 'ArrowUp')    { shiftWorld({ x: 0, y: this.speed  }) }
-    if(KEY_PRESSED === 'ArrowDown')  { shiftWorld({ x: 0, y: -this.speed }) }
-    if(KEY_PRESSED === 'ArrowLeft')  { shiftWorld({ x: this.speed,  y: 0 }) }
-    if(KEY_PRESSED === 'ArrowRight') { shiftWorld({ x: -this.speed, y: 0 }) }
-
-    KEY_PRESSED = null
- }
-
-  draw() {
-    CONTEXT.fillStyle = this.color
-    CONTEXT.fillRect(this.x, this.y, this.width, this.height)
+  draw(context) {
+    context.fillStyle = this.color
+    context.fillRect(this.x, this.y, this.width, this.height)
   }
 }
 
-class House extends Agent {
+class Character extends Entity {
+  constructor(opts) {
+    super({ x: opts.x, y: opts.y, height: TILE(1), width: TILE(1), color: '#ffaffa', speed: TILE(0.2) })
+  }
+}
+
+class House extends Entity {
   constructor(opts) {
     super({ x: opts.x, y: opts.y, height: TILE(2), width: TILE(2), color: '#faafaa', speed: 0 })
   }
 }
 
-class Road extends Agent {
+class Road extends Entity {
   constructor(opts) {
     super({ x: opts.x, y: opts.y, width: opts.lengthX, height: opts.lengthY, color: '#affaff', speed: 0 })
   }
 }
 
-const clear = () => {
-  CONTEXT.clearRect(0, 0, window.innerHeight, window.innerWidth)
+const tick = (world) => {
+  world.clear()
+  world.move()
+  world.draw()
+
+  window.requestAnimationFrame(() => tick(world))
 }
 
-const draw = (agents) => {
-  agents.forEach(agent => agent.draw())
+const start = (world) => {
+  tick(world)
 }
 
-const move = (agents) => {
-  agents.forEach(agent => agent.move())
-}
-
-const tick = () => {
-  clear()
-
-  draw(HOUSES)
-  draw(ROADS)
-
-  move(AGENTS)
-  draw(AGENTS)
-
-  window.requestAnimationFrame(tick)
-}
-
-window.addEventListener('keydown', (event) => { KEY_PRESSED = event.key })
-
-const start = () => {
-  tick()
-}
-
-setup()
-start()
+const world = setup(document.getElementById('canvas'))
+start(world)
