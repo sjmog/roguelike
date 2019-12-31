@@ -6,18 +6,16 @@ const setup = (canvas) => {
   canvas.height = window.innerHeight
   canvas.width = window.innerWidth
 
-  const world = new World(
-    {
-      context: canvas.getContext('2d'),
-      entities: [
-        new House({ x: TILE(3),  y: TILE(3) }),
-        new House({ x: TILE(10), y: TILE(10) }),
-        new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }),
-        new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) })
-      ],
-      character: new Character({ x: TILE(10), y: TILE(9) })
-    }
-  )
+  const world = new World({
+    context: canvas.getContext('2d'),
+    entities: [
+      new House({ x: TILE(3),  y: TILE(3) }),
+      new House({ x: TILE(10), y: TILE(10) }),
+      new Road( { x: TILE(4),  y: TILE(5), lengthX: TILE(7), lengthY: TILE(1) }),
+      new Road( { x: TILE(10), y: TILE(5), lengthX: TILE(1), lengthY: TILE(5) })
+    ],
+    character: new Character({ x: TILE(10), y: TILE(9) })
+  })
 
   window.addEventListener('keydown', (event) => { world.keyPresses.push(event.key) })
 
@@ -104,9 +102,4 @@ const tick = (world) => {
   window.requestAnimationFrame(() => tick(world))
 }
 
-const start = (world) => {
-  tick(world)
-}
-
-const world = setup(document.getElementById('canvas'))
-start(world)
+tick(setup(document.getElementById('canvas')))
